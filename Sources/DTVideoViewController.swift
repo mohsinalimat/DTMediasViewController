@@ -64,7 +64,7 @@ class DTVideoViewController: DTMediaViewController {
       let player = AVPlayer(URL: url)
       player.actionAtItemEnd = .None
       player.addObserver(self, forKeyPath: "status", options:NSKeyValueObservingOptions(), context: nil)
-      NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: player.currentItem)
+      NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(playerDidFinishPlaying(_:)), name: AVPlayerItemDidPlayToEndTimeNotification, object: player.currentItem)
       playerView.player = player
     }
   }
