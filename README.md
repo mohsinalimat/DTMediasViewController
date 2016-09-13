@@ -14,22 +14,32 @@ iOS 8+
 
 To install DTMediasViewController add a dependency to your Podfile:
 
-```ruby
-# source 'https://github.com/CocoaPods/Specs.git'
-# use_frameworks!
-# platform :ios, "8.0"
-
+```
 pod "DTMediasViewController"
 ```
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-To install DTMediasViewController add two dependencies to your Cartfile, FLAnimatedImage is needed to support gif:
+First, add FLAnimatedImage to your Cartfile and update. It is needed to support gif:
 
 ```
 github "Flipboard/FLAnimatedImage"
+```
+
+```
+carthage update --platform ios
+```
+
+Second, add DTMediasViewController to your Cartfile and update:
+
+```
 github "danjiang/DTMediasViewController"
 ```
+
+```
+carthage update --platform ios
+```
+
 ## Usage
 
 ### Import
