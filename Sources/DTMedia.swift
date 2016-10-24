@@ -9,29 +9,29 @@
 import UIKit
 
 public enum DTMediaType {
-  case Photo
-  case Gif
-  case Video
+  case photo
+  case gif
+  case video
 }
 
 public struct DTMedia {
   
   public let type: DTMediaType
   public var image: UIImage?
-  public var url: NSURL?
-  public var data: NSData?
+  public var url: URL?
+  public var data: Data?
   
   public init(image: UIImage) {
-    self.type = .Photo
+    self.type = .photo
     self.image = image
   }
   
-  public init(data: NSData) {
-    self.type = .Gif
+  public init(data: Data) {
+    self.type = .gif
     self.data = data
   }
   
-  public init(type: DTMediaType, url: NSURL) {
+  public init(type: DTMediaType, url: URL) {
     self.type = type
     self.url = url
   }

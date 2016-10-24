@@ -9,19 +9,19 @@
 import UIKit
 
 public protocol DTMediasViewControllerPhotoURLHandler {
-  func mediasViewController(mediasViewController: DTMediasViewController, photo: DTMedia, viewController: UIViewController)
+  func mediasViewController(_ mediasViewController: DTMediasViewController, photo: DTMedia, viewController: UIViewController)
 }
 
 public class DTMediasViewController: UIPageViewController {
   
   public var handler: DTMediasViewControllerPhotoURLHandler?
   
-  private var mediaViewControllers = [Int: DTMediaViewController]()
-  private var currentPage = 0
-  private var medias: [DTMedia]
-  private var photoPlaceholderImage: UIImage?
-  private var gifPlaceholderImage: UIImage?
-  private let pageLabel = UILabel()
+  fileprivate var mediaViewControllers = [Int: DTMediaViewController]()
+  fileprivate var currentPage = 0
+  fileprivate var medias: [DTMedia]
+  fileprivate var photoPlaceholderImage: UIImage?
+  fileprivate var gifPlaceholderImage: UIImage?
+  fileprivate let pageLabel = UILabel()
   
   public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -32,27 +32,27 @@ public class DTMediasViewController: UIPageViewController {
     self.photoPlaceholderImage = photoPlaceholderImage
     self.gifPlaceholderImage = gifPlaceholderImage
     self.currentPage = currentPage
-    super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+    super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
   }
 
   public override func loadView() {
     super.loadView()
     
-    view.backgroundColor = UIColor.blackColor()
+    view.backgroundColor = UIColor.black
     
     dataSource = self
     delegate = self
     
     if medias.count > 1 {
-      pageLabel.font = UIFont.systemFontOfSize(14)
+      pageLabel.font = UIFont.systemFont(ofSize: 14)
       pageLabel.textColor = UIColor(red: 0.52, green: 0.52, blue: 0.52, alpha: 1)
       
       view.addSubview(pageLabel)
       
       pageLabel.translatesAutoresizingMaskIntoConstraints = false
       
-      let centerX = NSLayoutConstraint(item: pageLabel, attribute: .CenterX, relatedBy: .Equal, toItem: view, attribute: .CenterX, multiplier: 1, constant: 0)
-      let bottom = NSLayoutConstraint(item: pageLabel, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: -10)
+      let centerX = NSLayoutConstraint(item: pageLabel, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1, constant: 0)
+      let bottom = NSLayoutConstraint(item: pageLabel, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: -10)
       
       view.addConstraints([centerX, bottom])
     }
@@ -62,24 +62,24 @@ public class DTMediasViewController: UIPageViewController {
     super.viewDidLoad()
     
     if let photoViewController = mediaViewControllerWithPage(currentPage) {
-      setViewControllers([photoViewController], direction: .Forward, animated: false, completion: nil)
+      setViewControllers([photoViewController], direction: .forward, animated: false, completion: nil)
     }
     reloadPageLabel()
   }
   
-  public func setPhoto(media: DTMedia, forViewController viewController: UIViewController) {
+  public func setPhoto(_ media: DTMedia, forViewController viewController: UIViewController) {
     if let photoViewController = viewController as? DTPhotoViewController {
       photoViewController.setImageViewWithPhoto(media)
     }
   }
   
-  private func mediaViewControllerWithPage(page: Int) -> UIViewController? {
+  fileprivate func mediaViewControllerWithPage(_ page: Int) -> UIViewController? {
     if page >= 0 && page < medias.count {
       if let mediaViewController = mediaViewControllers[page] {
         return mediaViewController
       } else {
         let media = medias[page]
-        if media.type == .Video {
+        if media.type == .video {
           let videoViewController = DTVideoViewController(video: media)
           videoViewController.page = page
           mediaViewControllers[page] = videoViewController
@@ -99,7 +99,7 @@ public class DTMediasViewController: UIPageViewController {
     }
   }
   
-  private func reloadPageLabel() {
+  fileprivate func reloadPageLabel() {
     pageLabel.text = "\(currentPage + 1) / \(medias.count)"
   }
   
@@ -109,7 +109,7 @@ public class DTMediasViewController: UIPageViewController {
 
 extension DTMediasViewController: UIPageViewControllerDataSource {
   
-  public func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
     if let mediaViewController = viewController as? DTMediaViewController {
       return mediaViewControllerWithPage(mediaViewController.page + 1)
     } else {
@@ -117,7 +117,7 @@ extension DTMediasViewController: UIPageViewControllerDataSource {
     }
   }
   
-  public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+  public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
     if let mediaViewController = viewController as? DTMediaViewController {
       return mediaViewControllerWithPage(mediaViewController.page - 1)
     } else {
@@ -131,7 +131,7 @@ extension DTMediasViewController: UIPageViewControllerDataSource {
 
 extension DTMediasViewController: UIPageViewControllerDelegate {
   
-  public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+  public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
     if completed {
       if let mediaViewController = viewControllers?.last as? DTMediaViewController {
         currentPage = mediaViewController.page
@@ -146,7 +146,7 @@ extension DTMediasViewController: UIPageViewControllerDelegate {
 
 extension DTMediasViewController: DTPhotoViewControllerDelegate {
   
-  func photoViewControllerLoadPhoto(photoViewController: DTPhotoViewController) {
+  func photoViewControllerLoadPhoto(_ photoViewController: DTPhotoViewController) {
     handler?.mediasViewController(self, photo: photoViewController.photo, viewController: photoViewController)
   }
   

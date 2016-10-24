@@ -13,28 +13,28 @@ class DTVideoViewController: DTMediaViewController {
   
   var video: DTMedia
   
-  private let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .White)
-  private let playerView = DTPlayerView()
-  private let controlButton = UIButton()
-  private var play = false {
+  fileprivate let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
+  fileprivate let playerView = DTPlayerView()
+  fileprivate let controlButton = UIButton()
+  fileprivate var play = false {
     didSet {
       if oldValue != play {
         if play {
           canAutoPlay = false
           playerView.player?.play()
-          controlButton.setImage(imageWithName("pause"), forState: .Normal)
+          controlButton.setImage(imageWithName("pause"), for: .normal)
           showControlButtonWithAutoHidden()
         } else {
           playerView.player?.pause()
-          controlButton.setImage(imageWithName("play"), forState: .Normal)
-          controlButton.hidden = false
+          controlButton.setImage(imageWithName("play"), for: .normal)
+          controlButton.isHidden = false
         }
       }
     }
   }
-  private var isViewAppear = false
-  private var canAutoPlay = true
-  private var controlButtonHiddenTimer = NSTimer()
+  fileprivate var isViewAppear = false
+  fileprivate var canAutoPlay = true
+  fileprivate var controlButtonHiddenTimer = Timer()
   
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -42,7 +42,7 @@ class DTVideoViewController: DTMediaViewController {
   
   deinit {
     playerView.player?.removeObserver(self, forKeyPath: "status")
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: AVPlayerItemDidPlayToEndTimeNotification, object: playerView.player?.currentItem)
+    NotificationCenter.default.removeObserver(self, name: Notification.Name.AVPlayerItemDidPlayToEndTime, object: playerView.player?.currentItem)
   }
 
   init(video: DTMedia) {
@@ -53,7 +53,7 @@ class DTVideoViewController: DTMediaViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    view.backgroundColor = UIColor.blackColor()
+    view.backgroundColor = UIColor.black
     
     layoutPlayerView()
     layoutIndicatorView()
@@ -61,35 +61,35 @@ class DTVideoViewController: DTMediaViewController {
     
     if let url = video.url {
       indicatorView.startAnimating()
-      let player = AVPlayer(URL: url)
-      player.actionAtItemEnd = .None
+      let player = AVPlayer(url: url)
+      player.actionAtItemEnd = .none
       player.addObserver(self, forKeyPath: "status", options:NSKeyValueObservingOptions(), context: nil)
-      NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(playerDidFinishPlaying(_:)), name: AVPlayerItemDidPlayToEndTimeNotification, object: player.currentItem)
+      NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying(_:)), name: Notification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
       playerView.player = player
     }
   }
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     isViewAppear = true
     autoPlay()
   }
 
-  override func viewDidDisappear(animated: Bool) {
+  override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     
     isViewAppear = false
     play = false
   }
   
-  override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
     if let keyPath = keyPath {
       if keyPath == "status" {
         if let player = object as? AVPlayer {
-          if player.status == .ReadyToPlay {
+          if player.status == .readyToPlay {
             indicatorView.stopAnimating()
-            controlButton.hidden = false
+            controlButton.isHidden = false
             autoPlay()
           }
         }
@@ -101,82 +101,82 @@ class DTVideoViewController: DTMediaViewController {
     play = !play
   }
   
-  func playerDidFinishPlaying(note: NSNotification) {
+  func playerDidFinishPlaying(_ note: Notification) {
     play = false
   }
   
-  func playerViewSingleTapped(recognizer: UITapGestureRecognizer) {
+  func playerViewSingleTapped(_ recognizer: UITapGestureRecognizer) {
     if play == true {
       showControlButtonWithAutoHidden()
     } else {
-      presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
+      presentingViewController?.dismiss(animated: true, completion: nil)
     }
   }
   
   func hideControlButton() {
     if play == true {
-      controlButton.hidden = true
+      controlButton.isHidden = true
     }
   }
   
   // MARK: - Private
   
-  private func imageWithName(name: String) -> UIImage? {
-    let bundle = NSBundle(forClass: DTVideoViewController.self)
-    return UIImage(named: name, inBundle: bundle, compatibleWithTraitCollection: nil)
+  fileprivate func imageWithName(_ name: String) -> UIImage? {
+    let bundle = Bundle(for: DTVideoViewController.self)
+    return UIImage(named: name, in: bundle, compatibleWith: nil)
   }
   
-  private func layoutIndicatorView() {
+  fileprivate func layoutIndicatorView() {
     indicatorView.hidesWhenStopped = true
     
     view.addSubview(indicatorView)
     
     indicatorView.translatesAutoresizingMaskIntoConstraints = false
     
-    let centerX = NSLayoutConstraint(item: indicatorView, attribute: .CenterX, relatedBy: .Equal, toItem: view, attribute: .CenterX, multiplier: 1, constant: 0)
-    let centerY = NSLayoutConstraint(item: indicatorView, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1, constant: 0)
+    let centerX = NSLayoutConstraint(item: indicatorView, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1, constant: 0)
+    let centerY = NSLayoutConstraint(item: indicatorView, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1, constant: 0)
 
     view.addConstraints([centerX, centerY])
   }
   
-  private func layoutPlayerView() {
+  fileprivate func layoutPlayerView() {
     playerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playerViewSingleTapped(_:))))
 
     view.addSubview(playerView)
     
     playerView.translatesAutoresizingMaskIntoConstraints = false
     
-    let leading = NSLayoutConstraint(item: playerView, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1, constant: 0)
-    let trailing = NSLayoutConstraint(item: playerView, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1, constant: 0)
-    let top = NSLayoutConstraint(item: playerView, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0)
-    let bottom = NSLayoutConstraint(item: playerView, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0)
+    let leading = NSLayoutConstraint(item: playerView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0)
+    let trailing = NSLayoutConstraint(item: playerView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
+    let top = NSLayoutConstraint(item: playerView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0)
+    let bottom = NSLayoutConstraint(item: playerView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
     
     view.addConstraints([leading, trailing, top, bottom])
   }
   
-  private func layoutControlButton() {
-    controlButton.hidden = true
+  fileprivate func layoutControlButton() {
+    controlButton.isHidden = true
     
-    controlButton.setImage(imageWithName("play"), forState: .Normal)
-    controlButton.addTarget(self, action: #selector(controlPlay), forControlEvents: .TouchUpInside)
+    controlButton.setImage(imageWithName("play"), for: .normal)
+    controlButton.addTarget(self, action: #selector(controlPlay), for: .touchUpInside)
     
     view.addSubview(controlButton)
     
     controlButton.translatesAutoresizingMaskIntoConstraints = false
     
-    let centerX = NSLayoutConstraint(item: controlButton, attribute: .CenterX, relatedBy: .Equal, toItem: view, attribute: .CenterX, multiplier: 1, constant: 0)
-    let centerY = NSLayoutConstraint(item: controlButton, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1, constant: 0)
+    let centerX = NSLayoutConstraint(item: controlButton, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1, constant: 0)
+    let centerY = NSLayoutConstraint(item: controlButton, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1, constant: 0)
     
     view.addConstraints([centerX, centerY])
   }
   
-  private func showControlButtonWithAutoHidden() {
-    controlButton.hidden = false
+  fileprivate func showControlButtonWithAutoHidden() {
+    controlButton.isHidden = false
     controlButtonHiddenTimer.invalidate()
-    controlButtonHiddenTimer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: #selector(hideControlButton), userInfo: nil, repeats: false)
+    controlButtonHiddenTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(hideControlButton), userInfo: nil, repeats: false)
   }
   
-  private func autoPlay() {
+  fileprivate func autoPlay() {
     if isViewAppear && canAutoPlay {
       play = true
     }

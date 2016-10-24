@@ -10,7 +10,7 @@ import UIKit
 import FLAnimatedImage
 
 protocol DTPhotoViewControllerDelegate {
-  func photoViewControllerLoadPhoto(photoViewController: DTPhotoViewController)
+  func photoViewControllerLoadPhoto(_ photoViewController: DTPhotoViewController)
 }
 
 class DTPhotoViewController: DTMediaViewController {
@@ -20,9 +20,9 @@ class DTPhotoViewController: DTMediaViewController {
   var gifPlaceholderImage: UIImage?
   var photo: DTMedia
   
-  private let scrollView = UIScrollView()
-  private let imageView: UIImageView
-  private var fitScale: CGFloat = 1
+  fileprivate let scrollView = UIScrollView()
+  fileprivate let imageView: UIImageView
+  fileprivate var fitScale: CGFloat = 1
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -30,7 +30,7 @@ class DTPhotoViewController: DTMediaViewController {
   
   init(photo: DTMedia) {
     self.photo = photo
-    if photo.type == .Gif {
+    if photo.type == .gif {
       imageView = FLAnimatedImageView()
     } else {
       imageView = UIImageView()
@@ -41,30 +41,30 @@ class DTPhotoViewController: DTMediaViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    view.backgroundColor = UIColor.blackColor()
+    view.backgroundColor = UIColor.black
     
-    scrollView.backgroundColor = UIColor.blackColor()
+    scrollView.backgroundColor = UIColor.black
     scrollView.showsHorizontalScrollIndicator = false
     scrollView.showsVerticalScrollIndicator = false
     scrollView.delegate = self
     scrollView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(scrollViewSingleTapped(_:))))
-    scrollView.scrollEnabled = false
+    scrollView.isScrollEnabled = false
     
     view.addSubview(scrollView)
     scrollView.addSubview(imageView)
     
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     
-    let leading = NSLayoutConstraint(item: scrollView, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1, constant: 0)
-    let trailing = NSLayoutConstraint(item: scrollView, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1, constant: 0)
-    let top = NSLayoutConstraint(item: scrollView, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0)
-    let bottom = NSLayoutConstraint(item: scrollView, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0)
+    let leading = NSLayoutConstraint(item: scrollView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0)
+    let trailing = NSLayoutConstraint(item: scrollView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
+    let top = NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0)
+    let bottom = NSLayoutConstraint(item: scrollView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
     
     view.addConstraints([leading, trailing, top, bottom])
     
-    let width = CGRectGetWidth(view.bounds)
-    let height = CGRectGetHeight(view.bounds)
-    if photo.type == .Gif {
+    let width = view.bounds.width
+    let height = view.bounds.height
+    if photo.type == .gif {
       imageView.image = gifPlaceholderImage
     } else {
       imageView.image = photoPlaceholderImage
@@ -74,21 +74,21 @@ class DTPhotoViewController: DTMediaViewController {
     setImageViewWithPhoto(photo)
   }
   
-  override func prefersStatusBarHidden() -> Bool {
+  override var prefersStatusBarHidden : Bool {
     return true
   }
   
-  override func viewWillDisappear(animated: Bool) {
+  override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
     scrollView.zoomScale = fitScale
   }
   
-  func setImageViewWithPhoto(photo: DTMedia) {
+  func setImageViewWithPhoto(_ photo: DTMedia) {
     self.photo = photo
-    if photo.type == .Gif {
+    if photo.type == .gif {
       if let data = photo.data {
-        let image = FLAnimatedImage(animatedGIFData: data)
+        let image = FLAnimatedImage(animatedGIFData: data)!
         let animatedImageView = imageView as! FLAnimatedImageView
         animatedImageView.animatedImage = image
         caculateFitScaleWithImageSize(image.size)
@@ -105,11 +105,11 @@ class DTPhotoViewController: DTMediaViewController {
     }
   }
   
-  func scrollViewSingleTapped(recognizer: UITapGestureRecognizer) {
-    presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
+  func scrollViewSingleTapped(_ recognizer: UITapGestureRecognizer) {
+    presentingViewController?.dismiss(animated: true, completion: nil)
   }
   
-  private func caculateFitScaleWithImageSize(size: CGSize) {
+  fileprivate func caculateFitScaleWithImageSize(_ size: CGSize) {
     imageView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
     scrollView.contentSize = size
     
@@ -132,7 +132,7 @@ class DTPhotoViewController: DTMediaViewController {
     }
   }
   
-  private func centerScrollViewContents() {
+  fileprivate func centerScrollViewContents() {
     let boundsSize = view.bounds.size
     var contentsFrame = imageView.frame
     
@@ -157,11 +157,11 @@ class DTPhotoViewController: DTMediaViewController {
 
 extension DTPhotoViewController: UIScrollViewDelegate {
   
-  func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+  func viewForZooming(in scrollView: UIScrollView) -> UIView? {
     return imageView
   }
   
-  func scrollViewDidZoom(scrollView: UIScrollView) {
+  func scrollViewDidZoom(_ scrollView: UIScrollView) {
     centerScrollViewContents()
   }
   
