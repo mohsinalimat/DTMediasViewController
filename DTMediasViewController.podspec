@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = "DTMediasViewController"
-  spec.version = "1.0.0"
+  spec.version = "1.0.1"
   spec.summary = "Browse photo, gif and video."
   spec.homepage = "https://github.com/danjiang/DTMediasViewController"
   spec.license = { type: 'MIT', file: 'LICENSE' }
